@@ -1,5 +1,5 @@
 /* ==========================================================
-   RescuENet · móvil
+   ALERTIA · móvil
    Sin librerías ni recursos externos. Funciona sin internet.
    Datos de demostración (no son datos reales de Ocaña).
    ========================================================== */
@@ -119,7 +119,7 @@ function topbar(s) {
     : `<span class="logo">${ICON.logo}</span>`;
   const sector = s.screen === 'verifica' ? SITIOS[s.ruta || 'ladera'].n : ROLES[s.role].sector;
   return `<header class="topbar">${lead}
-    <div class="brand"><b>RescuENet</b><small>${sector}</small></div>
+    <div class="brand"><b>ALERTIA</b><small>${sector}</small></div>
     <button type="button" class="theme-btn" data-action="theme" data-theme-btn aria-label="Cambiar entre fondo claro y oscuro">${themeIcon()}</button>
   </header>`;
 }

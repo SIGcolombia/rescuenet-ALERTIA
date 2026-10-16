@@ -47,7 +47,7 @@ const ICON = {
   info: I('<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.1"/>'),
   send: I('<path d="M21 3 3 10.5l7 2.5 2.5 7z"/>')
 };
-const CANAL = { sms: 'SMS', radio: 'Radio LoRa', app: 'App RescuENet', mula: 'Mula de datos' };
+const CANAL = { sms: 'SMS', radio: 'Radio LoRa', app: 'App ALERTIA', mula: 'Mula de datos' };
 
 /* ---------- datos de demostración ---------- */
 const RESP = {

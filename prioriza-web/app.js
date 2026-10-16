@@ -47,7 +47,7 @@ const ICON = {
   info: I('<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.1"/>'),
   send: I('<path d="M21 3 3 10.5l7 2.5 2.5 7z"/>')
 };
-const CANAL = { sms: 'SMS', radio: 'Radio LoRa', app: 'App RescuENet', mula: 'Mula de datos' };
+const CANAL = { sms: 'SMS', radio: 'Radio LoRa', app: 'App ALERTIA', mula: 'Mula de datos' };
 
 /* ---------- datos de demostración ---------- */
 const RESP = {
@@ -343,7 +343,7 @@ Object.assign(ICON, {
   bien: I('<circle cx="12" cy="12" r="9"/><path d="m7.8 12.4 3 3 5.6-6"/>')
 });
 
-/* ---------- mensajes que llegan de RescuENet ---------- */
+/* ---------- mensajes que llegan de ALERTIA ---------- */
 // Cada número es el mismo que ven los usuarios de la app móvil.
 const TIPO = {
   4: { t: 'SOS', k: 'k-actuar', ic: 'sos' },
@@ -414,9 +414,9 @@ function nav(s) {
   return `<nav class="nav" aria-label="Secciones">
     ${item('tablero', 'map', 'Tablero')}
     ${item('pase', 'clip', 'Pase de lista', `<span class="badge" aria-label="${sinR} sectores sin respuesta">${sinR}</span>`)}
-    ${item('bandeja', 'inbox', 'Bandeja RescuENet', nuevos ? `<span class="badge nuevo" aria-label="${nuevos} mensajes nuevos">${nuevos}</span>` : '')}
+    ${item('bandeja', 'inbox', 'Bandeja ALERTIA', nuevos ? `<span class="badge nuevo" aria-label="${nuevos} mensajes nuevos">${nuevos}</span>` : '')}
     ${item('bitacora', 'book', 'Bitácora')}
-    <p class="navnote">Prioriza recomienda. La decisión es del coordinador y queda en la bitácora.</p>
+    <p class="navnote"><b>ALERTIA</b> · alertas inteligentes para proteger vidas.<br>Prioriza recomienda. La decisión es del coordinador y queda en la bitácora.</p>
   </nav>`;
 }
 
@@ -480,7 +480,7 @@ function bandeja(s) {
   const max = Math.max(...SECTORS.map(x => x.reportes)) || 1;
   const porSector = [...SECTORS].sort((a, b) => b.reportes - a.reportes);
   const orden = [...s.inbox].sort((a, b) => b.l - a.l);
-  return `<div class="pagehead"><div><h1>Bandeja RescuENet</h1>
+  return `<div class="pagehead"><div><h1>Bandeja ALERTIA</h1>
       <p class="sub">Mensajes que llegan de la app de los vecinos, los vigías y los brigadistas, por SMS, radio comunitario o mula de datos.</p></div></div>
     <div class="cols2">
       <div class="col">
@@ -523,7 +523,7 @@ function drawer(s) {
     ['users', `${x.vuln} % de población vulnerable`, x.vuln >= 50],
     ['warn', `Amenaza ${x.amenaza} de ${x.tipo}`, x.amenaza === 'alta'],
     ...x.resp.map(([n, t]) => ['sms', `${veces(n)} el vigía respondió «${t}»`, false]),
-    ['app', `${x.reportes} ${x.reportes === 1 ? 'mensaje' : 'mensajes'} de RescuENet`, x.reportes === 0],
+    ['app', `${x.reportes} ${x.reportes === 1 ? 'mensaje' : 'mensajes'} de ALERTIA`, x.reportes === 0],
     ...(x.sinResp ? [['clock', `${x.sinResp} pases de lista sin respuesta`, true]] : []),
     ['pulse', `Probabilidad ${pct(x)}`, true]
   ];

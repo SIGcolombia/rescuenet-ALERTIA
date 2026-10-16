@@ -1,5 +1,5 @@
 /* ==========================================================
-   RescuENet · móvil
+   ALERTIA · móvil
    Colores de triaje fijos: SOS #C0392B, Salud y víveres #E0A800,
    Daños #D35400, Estamos bien #1E8449, Pendiente #7D3C98.
    Texto mínimo 18 px y botones de 72 px o más dentro de la app.
@@ -138,6 +138,8 @@ h1, h2, h3, p, output { margin: 0; }
 }
 .showcase h1 { font-size: clamp(22px, 3vw, 32px); font-weight: 800; letter-spacing: .01em; }
 .showcase h1 span { font-weight: 600; color: var(--ink-2); }
+.showcase-title { min-width: 0; }
+.tagline { margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
 .showcase-tools { display: flex; align-items: center; gap: 10px; }
 .showcase-foot { text-align: center; font-size: 13px; color: var(--ink-2); padding: 4px 16px 28px; }
 .stage { display: flex; justify-content: center; padding: 12px 16px 20px; }
