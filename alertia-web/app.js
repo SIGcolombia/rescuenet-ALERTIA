@@ -1,5 +1,5 @@
 /* ==========================================================
-   Prioriza · móvil
+   ALERTIA · web
    Sin librerías ni recursos externos. Funciona sin internet.
    Datos de demostración (no son datos reales de Ocaña).
    ========================================================== */
@@ -187,34 +187,8 @@ const SEED = [
 ];
 const EST = { curso: { t: 'En curso', k: 'k-amar' }, cerrado: { t: 'Cerrado', k: 'k-ok' }, fallido: { t: 'No concluyó', k: 'k-nar' } };
 
-/* ---------- estado ---------- */
-const equiposIni = () => ({
-  bomberos1: { estado: 'disponible' }, dc3: { estado: 'disponible' },
-  dron1: { estado: 'disponible' }, cruzroja2: { estado: 'enruta', destino: 'Centro' }
-});
-const baseState = () => ({
-  tab: 'tablero', mode: 'prioriza', sheet: null, pase: { enviado: null },
-  equipos: equiposIni(), bitacora: SEED.map(x => ({ ...x })), minutos: 14 * 60 + 34, toast: null
-});
-const PRESETS = [
-  { t: 'Tablero principal', s: 'Qué hacer ahora y mapa de sectores', make: () => baseState() },
-  { t: 'Tablero común', s: 'Lo que vería un tablero que solo cuenta mensajes', make: () => ({ ...baseState(), mode: 'comun' }) },
-  { t: 'Detalle de sector', s: 'Por qué Ladera norte está en «Explorar primero»', make: () => ({ ...baseState(), sheet: { type: 'sector', id: 'ladera', fresh: false } }) },
-  { t: 'Pase de lista', s: 'Quién contestó y quién no', make: () => ({ ...baseState(), tab: 'pase' }) },
-  { t: 'Asignar equipo', s: 'Recomendación y motivo obligatorio', make: () => { const b = baseState(); b.sheet = { type: 'asignar', id: 'valta', intent: 'verificar', team: recomendado('valta', b.equipos), motivo: '', fresh: false }; return b; } },
-  { t: 'Bitácora de decisiones', s: 'Rendición de cuentas de cada decisión', make: () => ({ ...baseState(), tab: 'bitacora' }) }
-];
 
-let st = baseState();
-let view = 'gallery';
-let toastTimer = 0;
-const narrowMQ = window.matchMedia('(max-width: 520px)');
-const isNarrow = () => narrowMQ.matches;
-
-/* ---------- piezas pequeñas ---------- */
-const themeNow = () => document.documentElement.dataset.theme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-const themeIcon = () => (themeNow() === 'dark' ? ICON.sun : ICON.moon);
-
+/* ---------- piezas del tablero (iguales a la versión móvil) ---------- */
 function rangeBar(s, full) {
   const lo = Math.max(0, s.prob - s.margen), hi = Math.min(100, s.prob + s.margen);
   if (!full) {
@@ -276,26 +250,6 @@ function legend(mode) {
     <span class="lg k-actuar"><i class="sw fill"></i>Actuar</span>
     <span class="lg k-explorar"><i class="sw dash"></i>Explorar · no sabemos</span>
     <span class="lg k-ok"><i class="sw"></i>Sin novedad</span></div>`;
-}
-
-/* ---------- pantallas ---------- */
-function topbar(s) {
-  const h = horaEvento(s.minutos);
-  return `<header class="topbar">
-    <div class="brand"><span class="logo">${ICON.pulse}</span><div><b>Prioriza</b><small>Puesto de Mando de Ocaña</small></div></div>
-    <div class="hora" aria-label="Hora ${h} desde el inicio del evento"><b>Hora ${h}</b><small>desde el inicio</small></div>
-    <button type="button" class="icon-btn" data-action="theme" data-theme-btn aria-label="Cambiar entre tema claro y oscuro">${themeIcon()}</button>
-  </header>`;
-}
-
-function tabbar(s) {
-  const sinResp = SECTORS.filter(x => !x.sabe).length;
-  const tab = (id, ic, txt, extra = '') => `<button type="button" class="tab" data-action="tab" data-tab="${id}" ${s.tab === id ? 'aria-current="page"' : ''}>${ICON[ic]}<span>${txt}</span>${extra}</button>`;
-  return `<nav class="tabbar" aria-label="Secciones">
-    ${tab('tablero', 'map', 'Tablero')}
-    ${tab('pase', 'clip', 'Pase de lista', `<span class="badge" aria-label="${sinResp} sectores sin respuesta">${sinResp}</span>`)}
-    ${tab('bitacora', 'book', 'Bitácora')}
-  </nav>`;
 }
 
 function knowCard() {
@@ -376,55 +330,232 @@ function rankingComun() {
       <span class="mbar" aria-hidden="true"><i style="width:${Math.round(s.reportes / max * 100)}%"></i></span></span></button></li>`).join('')}
   </ol></section>
   <p class="callout"><b>${l.nombre}</b> (${miles(l.hab)} habitantes, ${l.vuln} % vulnerables) quedaría en el puesto ${pos(l.id)}.º y <b>${v.nombre}</b> en el ${pos(v.id)}.º. Lo que no manda mensajes no aparece.</p>
-  <button type="button" class="btn neutral block" data-action="mode" data-mode="prioriza">Ver como Prioriza</button>`;
+  <button type="button" class="btn neutral block" data-action="mode" data-mode="alertia">Ver como ALERTIA</button>`;
 }
 
-function tableroScreen(s) {
-  const comun = s.mode === 'comun';
-  return `<div class="stack">
-    ${knowCard()}
-    <div class="modebar"><span class="lbl">Ver como</span>
-      <div class="seg" role="group" aria-label="Ver como">
-        <button type="button" data-action="mode" data-mode="prioriza" aria-pressed="${!comun}">Prioriza</button>
-        <button type="button" data-action="mode" data-mode="comun" aria-pressed="${comun}">Tablero común</button>
-      </div></div>
-    ${canales()}
-    ${comun ? `<div class="banner" role="note">${ICON.warn}<span>Así ordenaría un tablero que solo cuenta mensajes. Lo que no manda mensajes no aparece.</span></div>` : ''}
-    <section class="card mapcard" aria-label="Mapa de sectores">
-      <header><h2>Mapa de sectores</h2><small>Toca un sector</small></header>
-      ${mapSvg(s.mode)}${legend(s.mode)}
-    </section>
-    ${comun ? rankingComun() : queHacer() + listas()}
-  </div>`;
+
+/* ---------- iconos extra de la versión web ---------- */
+Object.assign(ICON, {
+  logo: I('<circle cx="6" cy="7" r="2.2"/><circle cx="18" cy="7" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M8.2 7h7.6M7.2 9l3.7 7.2M16.8 9l-3.7 7.2"/>'),
+  inbox: I('<path d="M3.5 13.5 6.5 5h11l3 8.5V19a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"/><path d="M3.5 13.5H9a3 3 0 0 0 6 0h5.5"/>'),
+  sos: I('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.8"/><path d="M5.6 5.6l3.7 3.7M14.7 14.7l3.7 3.7M18.4 5.6l-3.7 3.7M9.3 14.7l-3.7 3.7"/>'),
+  salud: I('<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 7.5v9M7.5 12h9"/>'),
+  danos: I('<path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M6 10v10h12V10"/><path d="m12.5 11.5-2 3.2 3 1.2-2 4"/>'),
+  bien: I('<circle cx="12" cy="12" r="9"/><path d="m7.8 12.4 3 3 5.6-6"/>')
+});
+
+/* ---------- mensajes que llegan de ALERTIA ---------- */
+// Cada número es el mismo que ven los usuarios de la app móvil.
+const TIPO = {
+  4: { t: 'SOS', k: 'k-actuar', ic: 'sos' },
+  3: { t: 'Salud y víveres', k: 'k-amar', ic: 'salud' },
+  2: { t: 'Daños', k: 'k-nar', ic: 'danos' },
+  1: { t: 'Estamos bien', k: 'k-ok', ic: 'bien' }
+};
+const sec = id => byId[id].nombre;
+const NBSP = '\u00a0';
+const INBOX0 = [
+  { l: 14 * 60 + 31, c: 'sms', s: 'ribera', n: 4, t: 'Presidente de la JAC respondió «4» al pase de lista de las 2:00 p. m.' },
+  { l: 14 * 60 + 22, c: 'app', s: 'ribera', n: 4, t: '5 personas, atrapados: sí. Necesitan agua y medicina.' },
+  { l: 14 * 60 + 19, c: 'radio', s: 'centro', n: 2, t: 'Inspector de policía respondió «2». Fachadas caídas y escombros en la vía.' },
+  { l: 14 * 60 + 12, c: 'app', s: 'centro', n: 3, t: '3 personas, heridos leves, dependen de oxígeno. Necesitan medicina.' },
+  { l: 14 * 60 + 9, e: 13 * 60 + 30, c: 'mula', s: 'ladera', n: 2, t: 'Habitante: grietas nuevas en la ladera y se oyen ruidos. Llegó con la mula de datos.' },
+  { l: 14 * 60 + 8, c: 'sms', s: 'sur', n: 1, t: 'Presidente de la JAC respondió «1». Estamos ayudando a los vecinos.' },
+  { l: 14 * 60 + 6, c: 'radio', s: 'valle', n: 1, t: 'Presidenta de la JAC respondió «1». Camino con barro, todos estamos bien.' },
+  { l: 14 * 60 + 4, c: 'radio', s: 'hosp', n: 1, t: 'Jefe de urgencias respondió «1». Atención normal.' },
+  { l: 14 * 60 + 2, c: 'sms', s: 'llana', n: 1, t: 'Docente de la escuela respondió «1».' }
+];
+// Lo que recoge Defensa Civil 3 en Vereda alta: 2 SOS, 3 salud y víveres, 4 daños, 3 estamos bien.
+const MULA_VALTA = [
+  [4, '4 personas atrapadas en una vivienda tras el derrumbe. Una con heridas graves.'],
+  [4, 'Dos adultos mayores no pueden salir de la vivienda. La vía está cortada.'],
+  [3, 'Se acabó el agua potable. Hay 6 niños.'],
+  [3, 'Necesitan medicina para la tensión y el azúcar.'],
+  [3, 'Varias familias sin alimentos desde ayer.'],
+  [2, 'Casa con el techo caído.'],
+  [2, 'Camino principal cortado por un derrumbe.'],
+  [2, 'Puente de la quebrada dañado.'],
+  [2, 'Dos viviendas con grietas grandes.'],
+  [1, 'Familia a salvo en la escuela rural.'],
+  [1, 'Sin novedad en la parte baja de la vereda.'],
+  [1, 'Vecinos reunidos en la caseta comunal, todos bien.']
+];
+
+const sinPase = x => x.vigias.every(v => v.resp === 0);
+
+/* ---------- estado ---------- */
+const equiposIni = () => ({
+  bomberos1: { estado: 'disponible' }, dc3: { estado: 'disponible' },
+  dron1: { estado: 'disponible' }, cruzroja2: { estado: 'enruta', destino: 'Centro' }
+});
+const baseState = () => ({
+  view: 'tablero', mode: 'alertia', drawer: null, dlg: null, pase: { enviado: null },
+  equipos: equiposIni(), bitacora: SEED.map(x => ({ ...x })), minutos: 14 * 60 + 34, toast: null,
+  inbox: INBOX0.map(m => ({ ...m, e: m.e ?? m.l, nuevo: false })), mulaOk: false
+});
+let st = baseState();
+let toastTimer = 0;
+const themeNow = () => document.documentElement.dataset.theme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+const themeIcon = () => (themeNow() === 'dark' ? ICON.sun : ICON.moon);
+
+/* ---------- estructura ---------- */
+function header(s) {
+  const h = horaEvento(s.minutos);
+  return `<header class="hdr">
+    <div class="brand"><span class="logo">${ICON.logo}</span><div><b>ALERTIA</b><small>Alertas inteligentes para proteger vidas</small></div></div>
+    <div class="pmu"><b>Puesto de Mando Unificado</b><small>Ocaña, Norte de Santander</small></div>
+    <div class="hdr-chan">${canales()}</div>
+    <div class="hora" aria-label="Hora ${h} desde el inicio del evento"><b>Hora ${h}</b><small>desde el inicio</small></div>
+    <button type="button" class="icon-btn" data-action="theme" data-theme-btn aria-label="Cambiar entre tema claro y oscuro">${themeIcon()}</button>
+  </header>`;
 }
 
-function paseScreen(s) {
+function nav(s) {
+  const sinR = SECTORS.filter(sinPase).length;
+  const nuevos = s.inbox.filter(m => m.nuevo).length;
+  const item = (id, ic, txt, badge = '') => `<button type="button" data-action="tab" data-tab="${id}" ${s.view === id ? 'aria-current="page"' : ''}>${ICON[ic]}<span>${txt}</span>${badge}</button>`;
+  return `<nav class="nav" aria-label="Secciones">
+    ${item('tablero', 'map', 'Tablero')}
+    ${item('pase', 'clip', 'Pase de lista', `<span class="badge" aria-label="${sinR} sectores sin respuesta">${sinR}</span>`)}
+    ${item('bandeja', 'inbox', 'Bandeja ALERTIA', nuevos ? `<span class="badge nuevo" aria-label="${nuevos} mensajes nuevos">${nuevos}</span>` : '')}
+    ${item('bitacora', 'book', 'Bitácora')}
+    <p class="navnote">ALERTIA recomienda. La decisión es del coordinador y queda en la bitácora.</p>
+  </nav>`;
+}
+
+/* ---------- vistas ---------- */
+/* ---------- resumen, equipos y marcadores ---------- */
+function resumen(s) {
+  const act = SECTORS.filter(x => x.estado === 'actuar');
+  const vuln = act.reduce((n, x) => n + Math.round(x.hab * x.vuln / 100), 0);
   const sin = SECTORS.filter(x => !x.sabe).length;
-  const orden = [...SECTORS].sort((a, b) => (a.sabe - b.sabe));
-  return `<div class="stack">
-    <section class="card">
+  const msgs = SECTORS.reduce((n, x) => n + x.reportes, 0);
+  const libres = Object.values(s.equipos).filter(e => e.estado === 'disponible').length;
+  return `<section class="kpis" aria-label="Resumen de la situación">
+    <div class="kpi k-actuar"><span class="ki">${ICON.users}</span><div><b>${miles(vuln)}</b><span>personas vulnerables en ${act.length} sectores donde actuar</span></div></div>
+    <div class="kpi k-explorar dash"><span class="ki">${ICON.eye}</span><div><b>${sin} de ${SECTORS.length}</b><span>sectores sin información reciente</span></div></div>
+    <button type="button" class="kpi k-neutro" data-action="tab" data-tab="bandeja"><span class="ki">${ICON.inbox}</span><div><b>${msgs}</b><span>mensajes recibidos de ALERTIA <em>Ver bandeja</em></span></div></button>
+    <div class="kpi k-ok"><span class="ki">${ICON.truck}</span><div><b>${libres} de ${EQUIPOS.length}</b><span>equipos disponibles para asignar</span></div></div>
+  </section>`;
+}
+
+function equiposStrip(s) {
+  return `<div class="eqstrip" aria-label="Equipos en campo">${EQUIPOS.map(e => {
+    const t = s.equipos[e.id], libre = t.estado === 'disponible';
+    return `<span class="eq ${libre ? 'libre' : 'ruta'}">${ICON[e.icon]}<span><b>${eqNombre(e.id)}</b><small>${libre ? 'Disponible' : 'En ruta · ' + esc(t.destino)}</small></span></span>`;
+  }).join('')}</div>`;
+}
+
+function marcadoresEquipos(s) {
+  let out = '';
+  EQUIPOS.forEach(e => {
+    const t = s.equipos[e.id];
+    if (t.estado !== 'enruta') return;
+    const x = SECTORS.find(z => z.nombre === t.destino);
+    if (!x) return;
+    const bx = 218, by = 148;
+    const lejos = Math.hypot(x.x - bx, x.y - by) > 40;
+    const mx = lejos ? (x.x + bx) / 2 : x.x - x.r * .85, my = lejos ? (x.y + by) / 2 : x.y - x.r * .85;
+    const ic = ICON[e.icon].replace('<svg class="ic"', '<svg class="tm-ic" x="4" y="4" width="16" height="16"');
+    out += `${lejos ? `<path class="team-route" d="M${bx} ${by} L${x.x} ${x.y}"/>` : ''}
+      <g class="team-mk" transform="translate(${(mx - 12).toFixed(1)} ${(my - 12).toFixed(1)})"><rect width="24" height="24" rx="7"/>${ic}
+      <text x="12" y="-5">${esc(e.nombre)}</text></g>`;
+  });
+  return out;
+}
+
+function mapaConEquipos(s) {
+  const svg = mapSvg(s.mode);
+  if (s.mode === 'comun') return svg;
+  const i = svg.lastIndexOf('</svg>');
+  return svg.slice(0, i) + marcadoresEquipos(s) + svg.slice(i);
+}
+
+function tablero(s) {
+  const comun = s.mode === 'comun';
+  const modebar = `<div class="modebar"><span class="lbl">Ver como</span>
+      <div class="seg" role="group" aria-label="Ver como">
+        <button type="button" data-action="mode" data-mode="alertia" aria-pressed="${!comun}">ALERTIA</button>
+        <button type="button" data-action="mode" data-mode="comun" aria-pressed="${comun}">Tablero común</button>
+      </div></div>`;
+  return `<div class="pagehead"><div><h1>Tablero</h1>
+      <p class="sub">Evento iniciado a las 11:00${NBSP}a.${NBSP}m. · actualizado ${hhmm(s.minutos)} · ${comun ? 'Así ordenaría un tablero que solo cuenta mensajes.' : 'Qué hacer ahora, dónde no sabemos y dónde no hay novedad.'}</p></div>
+      <div class="pagetools">${modebar}<button type="button" class="btn ghost" data-action="export-situacion">${ICON.download}Exportar situación</button></div></div>
+    ${resumen(s)}
+    <div class="cols">
+      <div class="col sticky">
+        ${comun ? `<div class="banner" role="note">${ICON.warn}<span>Lo que no manda mensajes no aparece. Compáralo con ALERTIA.</span></div>` : ''}
+        <section class="card mapcard" aria-label="Mapa de sectores">
+          <header><h2>Mapa de sectores</h2><small>Selecciona un sector para ver por qué</small></header>
+          <div class="mapwrap">${mapaConEquipos(s)}<div class="maptip" id="maptip" role="tooltip" hidden></div></div>${legend(s.mode)}${comun ? '' : equiposStrip(s)}
+        </section>
+      </div>
+      <div class="col">${knowCard()}${comun ? rankingComun() : queHacer() + listas()}</div>
+    </div>`;
+}
+
+function paseView(s) {
+  const sin = SECTORS.filter(sinPase).length;
+  const orden = [...SECTORS].sort((a, b) => sinPase(b) - sinPase(a));
+  const vigias = SECTORS.reduce((n, x) => n + x.vigias.length, 0);
+  return `<div class="pagehead"><div><h1>Pase de lista</h1>
+      <p class="sub">Cada dos horas el sistema pregunta a los vigías «¿cómo está su sector?» con un solo número. Que no contesten también es un dato.</p></div></div>
+    <section class="card" style="margin-bottom:16px"><div class="paseh"><div>
       <p class="eyebrow">Pase de lista cada dos horas</p>
       <div class="tiles">
         <div class="tile"><small>Último pase</small><b>2:00&nbsp;p.&nbsp;m.</b></div>
         <div class="tile mor"><small>Sin ninguna respuesta</small><b>${sin} sectores</b></div>
         <div class="tile"><small>Próximo</small><b>4:00&nbsp;p.&nbsp;m.</b></div>
       </div>
-      ${s.pase.enviado ? `<p class="sent">${ICON.send}<span>Pase enviado a las ${s.pase.enviado} por SMS y radio. Esperando respuestas de ${SECTORS.reduce((n, x) => n + x.vigias.length, 0)} vigías.</span></p>` : ''}
-      <button type="button" class="btn neutral block" style="margin-top:12px" data-action="pase-ahora" ${s.pase.enviado ? 'disabled' : ''}>${ICON.clip}${s.pase.enviado ? 'Pase enviado' : 'Hacer pase de lista ahora'}</button>
-    </section>
-    <div class="pl-legend" aria-label="Significado de las respuestas">${[1, 2, 3, 4, 0].map(respChip).join('')}</div>
-    ${orden.map(x => `<article class="pl-card ${x.sabe ? '' : 'nc'}">
+      ${s.pase.enviado ? `<p class="sent">${ICON.send}<span>Pase enviado a las ${s.pase.enviado} por SMS y radio. Esperando respuestas de ${vigias} vigías.</span></p>` : ''}
+    </div>
+    <button type="button" class="btn neutral" data-action="pase-ahora" ${s.pase.enviado ? 'disabled' : ''}>${ICON.clip}${s.pase.enviado ? 'Pase enviado' : 'Hacer pase de lista ahora'}</button></div></section>
+    <div class="pl-legend" style="margin-bottom:14px" aria-label="Significado de las respuestas">${[1, 2, 3, 4, 0].map(respChip).join('')}</div>
+    <div class="pase-grid">${orden.map(x => `<article class="pl-card ${sinPase(x) ? 'nc' : ''}">
       <h3>${x.nombre}</h3>
       ${x.vigias.map(v => `<div class="pl-row"><div class="who"><b>${v.rol}</b><small>${ICON[v.canal]}${CANAL[v.canal]}</small></div>${respChip(v.resp)}</div>`).join('')}
-    </article>`).join('')}
-  </div>`;
+    </article>`).join('')}</div>`;
 }
 
-function bitacoraScreen(s) {
-  return `<div class="stack">
-    <h2 class="h2" style="margin:4px 2px 0">Bitácora de decisiones</h2>
-    <button type="button" class="btn ghost block" data-action="export">${ICON.download}Exportar informe</button>
-    <p class="note">${ICON.info}<span>Cada decisión guarda la recomendación del sistema para la rendición de cuentas.</span></p>
+function mensaje(m) {
+  const t = TIPO[m.n], tarde = m.e !== m.l;
+  return `<li class="msg ${t.k} ${m.nuevo ? 'nuevo' : ''}">
+    <span class="tb">${ICON[t.ic]}</span>
+    <div class="mt"><p>${esc(m.t)}</p>
+      <small><span class="tipo">${m.n} · ${t.t}</span><span><b>${sec(m.s)}</b></span><span>${ICON[m.c]}${CANAL[m.c]}</span>
+      <span>${ICON.clock}Llegó ${hhmm(m.l)}${tarde ? ` · escrito en la hora ${horaEvento(m.e)}` : ''}</span></small></div>
+    ${m.nuevo ? '<span class="newtag">Nuevo</span>' : ''}</li>`;
+}
+
+function bandeja(s) {
+  const cnt = n => s.inbox.filter(m => m.n === n).length;
+  const max = Math.max(...SECTORS.map(x => x.reportes)) || 1;
+  const porSector = [...SECTORS].sort((a, b) => b.reportes - a.reportes);
+  const orden = [...s.inbox].sort((a, b) => b.l - a.l);
+  return `<div class="pagehead"><div><h1>Bandeja ALERTIA</h1>
+      <p class="sub">Mensajes que llegan de la app de los vecinos, los vigías y los brigadistas, por SMS, radio comunitario o mula de datos.</p></div></div>
+    <div class="cols2">
+      <div class="col">
+        <section class="card"><p class="eyebrow">Mensajes por tipo</p>
+          <div class="mtiles">${[4, 3, 2, 1].map(n => `<div class="mtile ${TIPO[n].k}"><span class="tb">${ICON[TIPO[n].ic]}</span><div><b>${cnt(n)}</b><span>${TIPO[n].t}</span></div></div>`).join('')}</div></section>
+        <section class="card mulacard"><p class="eyebrow" style="color:var(--explorar-t)">Mula de datos</p>
+          <h2>${s.mulaOk ? 'Defensa Civil 3 entregó los mensajes de Vereda alta' : 'Defensa Civil 3 regresa de Vereda alta con mensajes guardados'}</h2>
+          <p>${s.mulaOk ? 'ALERTIA recalculó el sector con lo que llegó. Revisa el tablero.' : 'Vereda alta no ha contestado ningún pase de lista. Los teléfonos de la vereda guardaron mensajes que la mula recogió en el camino.'}</p>
+          <button type="button" class="btn neutral" data-action="mula-sim" ${s.mulaOk ? 'disabled' : ''}>${ICON.mula}${s.mulaOk ? 'Mensajes entregados' : 'Simular llegada de la mula'}</button>
+          <p class="cap">Simulación con datos de demostración. En la versión real los mensajes llegan solos cuando el equipo recupera señal o radio.</p></section>
+        <section class="card"><p class="eyebrow">Mensajes por sector</p>
+          <ul class="persec">${porSector.map(x => `<li class="${x.reportes === 0 ? 'zero' : ''}"><span>${x.nombre}</span><span class="bar" aria-hidden="true"><i style="width:${Math.round(x.reportes / max * 100)}%"></i></span><b>${x.reportes}</b></li>`).join('')}</ul>
+          <p class="cap" style="margin-top:10px">Un sector con cero mensajes no es un sector tranquilo: puede ser un sector incomunicado.</p></section>
+      </div>
+      <div class="col"><section aria-label="Últimos mensajes recibidos"><h2 class="h2" style="margin:0 0 10px">Últimos mensajes recibidos</h2>
+        <ol class="msgs">${orden.map(mensaje).join('')}</ol></section></div>
+    </div>`;
+}
+
+function bitacora(s) {
+  return `<div class="pagehead"><div><h1>Bitácora de decisiones</h1>
+      <p class="sub">Cada decisión guarda la recomendación del sistema para la rendición de cuentas.</p></div>
+      <button type="button" class="btn ghost" data-action="export">${ICON.download}Exportar informe</button></div>
     <ol class="log">${s.bitacora.map(b => `<li class="entry ${EST[b.est].k}">
       <div class="top"><div><p class="when">Hora ${horaEvento(b.min)} · ${hhmm(b.min)}</p><p class="sec">${b.sector}</p></div>
         <span class="tagc ${EST[b.est].k}">${EST[b.est].t}</span></div>
@@ -432,19 +563,19 @@ function bitacoraScreen(s) {
       <dl class="kv"><dt>Responsable</dt><dd>${b.resp}</dd><dt>Motivo</dt><dd>${esc(b.motivo)}</dd><dt>Resultado</dt><dd>${esc(b.resultado)}</dd></dl>
       <div class="sys"><b>El sistema recomendaba</b>${esc(nb(b.sistema))}</div>
       <div class="pills"><span class="tagc ${b.siguio ? 'k-ok' : 'k-nar'}">${b.siguio ? 'Siguió la recomendación' : 'Se apartó de la recomendación'}</span></div>
-    </li>`).join('')}</ol>
-  </div>`;
+    </li>`).join('')}</ol>`;
 }
 
-/* ---------- hojas inferiores ---------- */
-function sectorSheet(s) {
-  const x = byId[s.sheet.id], k = ESTADO[x.estado].k;
+/* ---------- panel de sector y diálogo de asignación ---------- */
+function drawer(s) {
+  const x = byId[s.drawer.id], k = ESTADO[x.estado].k;
   const lo = Math.max(0, x.prob - x.margen), hi = Math.min(100, x.prob + x.margen);
   const why = [
     ['users', `${miles(x.hab)} habitantes`, false],
     ['users', `${x.vuln} % de población vulnerable`, x.vuln >= 50],
     ['warn', `Amenaza ${x.amenaza} de ${x.tipo}`, x.amenaza === 'alta'],
     ...x.resp.map(([n, t]) => ['sms', `${veces(n)} el vigía respondió «${t}»`, false]),
+    ['app', `${x.reportes} ${x.reportes === 1 ? 'mensaje' : 'mensajes'} de ALERTIA`, x.reportes === 0],
     ...(x.sinResp ? [['clock', `${x.sinResp} pases de lista sin respuesta`, true]] : []),
     ['pulse', `Probabilidad ${pct(x)}`, true]
   ];
@@ -456,9 +587,8 @@ function sectorSheet(s) {
         : `<p class="meta">Hora ${m.l} · ${CANAL[m.c]}</p>`}</div></li>`;
   }).join('');
   const prim = x.estado === 'explorar' ? 'verificar' : 'asignar';
-  return `<div class="backdrop" data-action="cerrar"></div>
-  <section class="sheet tall ${s.sheet.fresh ? 'anim' : ''} ${k}" role="dialog" aria-modal="true" aria-label="Detalle de ${esc(x.nombre)}" tabindex="-1">
-    <div class="grab"></div>
+  return `<div class="scrim" data-action="cerrar"></div>
+  <aside class="drawer ${k} ${s.drawer.fresh ? 'anim' : ''}" role="dialog" aria-modal="true" aria-label="Detalle de ${esc(x.nombre)}" tabindex="-1">
     <div class="sheet-h"><div><h2>${x.nombre}</h2>${tagEstado(x)}</div>
       <button type="button" class="icon-btn" data-action="cerrar" aria-label="Cerrar">${ICON.close}</button></div>
     <div class="sheet-b">
@@ -473,13 +603,13 @@ function sectorSheet(s) {
       <button type="button" class="btn ${prim === 'verificar' ? 'primary k-explorar' : 'ghost'}" data-action="asignar" data-id="${x.id}" data-intent="verificar">Enviar a verificar</button>
       <button type="button" class="btn ${prim === 'asignar' ? 'primary k-actuar' : 'ghost'}" data-action="asignar" data-id="${x.id}" data-intent="asignar">Asignar equipo</button>
     </div>
-  </section>`;
+  </aside>`;
 }
 
-const validar = () => !!(st.sheet && st.sheet.type === 'asignar' && st.sheet.team && st.sheet.motivo.trim().length >= 5);
+const validar = () => !!(st.dlg && st.dlg.team && st.dlg.motivo.trim().length >= 5);
 
-function asignarSheet(s) {
-  const sh = s.sheet, x = byId[sh.id];
+function dialogo(s) {
+  const sh = s.dlg, x = byId[sh.id];
   const reco = recomendado(x.id, s.equipos);
   const lista = EQUIPOS.map(e => {
     const est = s.equipos[e.id], ru = rutaDe(x.id, e.id);
@@ -494,11 +624,10 @@ function asignarSheet(s) {
   }).join('');
   const ok = validar();
   const aparta = sh.team && reco && sh.team !== reco;
-  return `<div class="backdrop" data-action="cerrar"></div>
-  <section class="sheet ${s.sheet.fresh ? 'anim' : ''}" role="dialog" aria-modal="true" aria-label="Asignar equipo" tabindex="-1">
-    <div class="grab"></div>
+  return `<div class="scrim" style="z-index:41" data-action="cerrar-dlg"></div>
+  <section class="dlg ${sh.fresh ? 'anim' : ''}" role="dialog" aria-modal="true" aria-label="Asignar equipo" tabindex="-1">
     <div class="sheet-h"><div><h2>Asignar equipo</h2><p>${x.nombre} · ${sh.intent === 'verificar' ? 'enviar a verificar' : 'ayuda inmediata'}</p></div>
-      <button type="button" class="icon-btn" data-action="cerrar" aria-label="Cerrar">${ICON.close}</button></div>
+      <button type="button" class="icon-btn" data-action="cerrar-dlg" aria-label="Cerrar">${ICON.close}</button></div>
     <div class="sheet-b">
       ${reco ? `<p class="reco">${ICON.star}<span><b>Recomendado: ${eqNombre(reco)}</b>, ${razon(x.id, reco)}.</span></p>`
         : `<p class="reco none">${ICON.warn}<span><b>Ningún equipo disponible puede llegar.</b> Libera uno o prueba otro canal.</span></p>`}
@@ -515,76 +644,41 @@ function asignarSheet(s) {
 
 /* ---------- montaje ---------- */
 function appHtml(s) {
-  const pantalla = s.tab === 'pase' ? paseScreen(s) : s.tab === 'bitacora' ? bitacoraScreen(s) : tableroScreen(s);
-  const hoja = !s.sheet ? '' : s.sheet.type === 'sector' ? sectorSheet(s) : asignarSheet(s);
-  return `<div class="app">${topbar(s)}<main class="content" tabindex="-1">${pantalla}</main>${tabbar(s)}${hoja}${s.toast ? `<div class="toast" role="status">${esc(s.toast)}</div>` : ''}</div>`;
-}
-
-function phone(s, live) {
-  return `<div class="phone" ${live ? 'data-live' : 'aria-hidden="true"'}>
-    <div class="screen"><span class="notch"></span>
-      <div class="statusbar"><span>${hhmm(s.minutos).split(' ')[0]}</span>
-        <span class="sb-r"><span class="sb-sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:11px"></i></span><span class="sb-bat"><i></i></span></span></div>
-      ${appHtml(s)}
-    </div></div>`;
-}
-
-function renderStage() {
-  const stage = $('#stage');
-  if (isNarrow() && view === 'gallery') view = 'app';
-  document.querySelectorAll('[data-action="view"]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
-  if (view === 'gallery') {
-    stage.innerHTML = `<div class="gallery">${PRESETS.map((p, i) => `<figure class="gal-item">
-      <div class="phone-wrap gal-open" role="button" tabindex="0" data-action="open-preset" data-i="${i}" aria-label="Abrir «${p.t}» en la app">${phone(p.make(), false)}</div>
-      <figcaption class="gal-cap">${i + 1} · ${p.t}<small>${p.s}</small></figcaption></figure>`).join('')}</div>`;
-  } else {
-    stage.innerHTML = `<div class="phone-wrap live">${phone(st, true)}</div>`;
-    fit();
-  }
-  syncThemeButtons();
+  const vista = s.view === 'pase' ? paseView(s) : s.view === 'bandeja' ? bandeja(s) : s.view === 'bitacora' ? bitacora(s) : tablero(s);
+  return `<div class="web">${header(s)}<div class="shell">${nav(s)}
+    <main class="main" id="main" tabindex="-1">${vista}<p class="foot-demo">Datos de demostración. ALERTIA recomienda, la decisión es del coordinador.</p></main></div>
+    ${s.drawer ? drawer(s) : ''}${s.dlg ? dialogo(s) : ''}${s.toast ? `<div class="toast" role="status">${esc(s.toast)}</div>` : ''}</div>`;
 }
 
 function draw(reset) {
-  const wrap = $('.phone-wrap.live');
-  if (!wrap) return;
-  const c = $('.content', wrap), sb = $('.sheet-b', wrap), had = sb && sb.dataset.k;
-  const sc = c ? c.scrollTop : 0, sbs = sb ? sb.scrollTop : 0;
-  wrap.innerHTML = phone(st, true);
-  const c2 = $('.content', wrap), sb2 = $('.sheet-b', wrap);
-  if (c2 && !reset) c2.scrollTop = sc;
-  if (sb2 && sb && !reset && !st.sheet.fresh) sb2.scrollTop = sbs;
-  if (st.sheet && st.sheet.fresh) { st.sheet.fresh = false; const sh = $('.sheet', wrap); if (sh) sh.focus({ preventScroll: true }); }
-}
-
-function fit() {
-  const wrap = $('.phone-wrap.live');
-  if (!wrap) return;
-  if (isNarrow()) { wrap.style.removeProperty('--s'); return; }
-  const arriba = $('#showcase').offsetHeight, pie = $('#showcase-foot').offsetHeight;
-  const s = Math.min(1, (innerHeight - arriba - pie - 28) / 832, (innerWidth - 32) / 410);
-  wrap.style.setProperty('--s', Math.max(.5, s).toFixed(3));
-}
-
-function syncThemeButtons() {
-  document.querySelectorAll('[data-theme-btn]').forEach(b => { b.innerHTML = themeIcon(); });
+  const root = $('#root');
+  const y = window.scrollY, sb = $('.drawer .sheet-b'), sbs = sb ? sb.scrollTop : 0, hadDlg = !!$('.dlg');
+  root.innerHTML = appHtml(st);
+  if (reset) window.scrollTo(0, 0); else window.scrollTo(0, y);
+  const sb2 = $('.drawer .sheet-b');
+  if (sb2 && sb && !(st.drawer && st.drawer.fresh)) sb2.scrollTop = sbs;
+  const fresh = (st.dlg && st.dlg.fresh) ? $('.dlg') : (st.drawer && st.drawer.fresh) ? $('.drawer') : null;
+  if (st.drawer) st.drawer.fresh = false;
+  if (st.dlg) st.dlg.fresh = false;
+  if (fresh) fresh.focus({ preventScroll: true });
+  else if (hadDlg && !st.dlg && st.drawer) { const d = $('.drawer'); if (d) d.focus({ preventScroll: true }); }
 }
 
 /* ---------- acciones ---------- */
 function setTheme(t) {
   document.documentElement.dataset.theme = t;
-  try { localStorage.setItem('prioriza-tema', t); } catch (e) { /* sin almacenamiento */ }
-  syncThemeButtons();
+  try { localStorage.setItem('alertia-tema', t); } catch (e) { /* sin almacenamiento */ }
 }
 
-function toast(msg) {
+function toast(msg, ms = 3600) {
   st.toast = msg; draw();
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { st.toast = null; draw(); }, 3200);
+  toastTimer = setTimeout(() => { st.toast = null; draw(); }, ms);
 }
 
 function confirmar() {
   if (!validar()) return;
-  const sh = st.sheet, x = byId[sh.id], reco = recomendado(x.id, st.equipos);
+  const sh = st.dlg, x = byId[sh.id], reco = recomendado(x.id, st.equipos);
   st.minutos += 2;
   st.bitacora.unshift({
     min: st.minutos, sectorId: x.id, sector: x.nombre,
@@ -594,22 +688,34 @@ function confirmar() {
     siguio: sh.team === reco, resultado: 'En curso, el equipo va en camino.', est: 'curso'
   });
   st.equipos[sh.team] = { estado: 'enruta', destino: x.nombre };
-  st.sheet = null; st.tab = 'bitacora';
+  st.dlg = null; st.drawer = null; st.view = 'bitacora';
   draw(true);
   toast('Decisión guardada en la bitácora con la recomendación del sistema.');
 }
 
-function exportar() {
+function aplicarMula() {
+  st.mulaOk = true; st.minutos += 3;
+  const x = byId.valta;
+  Object.assign(x, { sabe: true, estado: 'actuar', prob: 71, margen: 11, reportes: MULA_VALTA.length, necesita: ['Salud', 'Agua y alimentos'] });
+  x.linea.unshift({ c: 'mula', e: 2, l: 3, t: 'Brigadista (mula de datos): 12 mensajes de la vereda, 2 SOS, 3 salud y víveres, 4 daños y 3 estamos bien.' });
+  MULA_VALTA.forEach(([n, t], i) => st.inbox.push({ l: st.minutos, e: 13 * 60 + 50 - i, c: 'mula', s: 'valta', n, t, nuevo: true }));
+}
+
+function simularMula() {
+  if (st.mulaOk) return;
+  aplicarMula();
+  draw();
+  toast('Llegaron 12 mensajes de Vereda alta. ALERTIA recalculó el sector: pasó de «Explorar primero» a «Actuar» (71 % ± 11 %). Simulación con datos de demostración.', 7000);
+}
+
+function descargarCSV(nombre, cab, filas) {
   try {
-    const cab = ['Hora', 'Sector', 'Decisión', 'Motivo', 'Responsable (rol)', 'Recomendación del sistema', 'Coincide con el sistema', 'Resultado'];
-    const filas = st.bitacora.map(b => [`Hora ${horaEvento(b.min)} · ${hhmm(b.min)}`, b.sector, b.decision, b.motivo, b.resp, b.sistema, b.siguio ? 'Sí' : 'No', b.resultado]);
-    const csv = '﻿' + [cab, ...filas].map(r => r.map(c => `"${String(c).replace(/ /g, ' ').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const csv = '﻿' + [cab, ...filas].map(r => r.map(c => `"${String(c).replace(/ /g, ' ').replace(/"/g, '""')}"`).join(';')).join('\r\n');
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a');
-    a.href = url; a.download = 'bitacora-prioriza-ocana.csv';
+    a.href = url; a.download = nombre;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1500);
-    // Algunos visores bloquean las descargas, por eso también se copia el CSV.
     const aviso = 'Informe CSV listo. Si no se descargó, quedó copiado para pegarlo en una hoja de cálculo.';
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(csv.replace(/^﻿/, '')).then(() => toast(aviso), () => toast('Informe CSV generado. Si no se descargó, prueba desde otro navegador.'));
@@ -621,30 +727,38 @@ function exportar() {
   }
 }
 
-function setView(v) {
-  view = isNarrow() ? 'app' : v;
-  renderStage();
+function exportar() {
+  const cab = ['Hora', 'Sector', 'Decisión', 'Motivo', 'Responsable (rol)', 'Recomendación del sistema', 'Coincide con el sistema', 'Resultado'];
+  const filas = st.bitacora.map(b => [`Hora ${horaEvento(b.min)} · ${hhmm(b.min)}`, b.sector, b.decision, b.motivo, b.resp, b.sistema, b.siguio ? 'Sí' : 'No', b.resultado]);
+  descargarCSV('bitacora-alertia-ocana.csv', cab, filas);
+}
+
+function exportarSituacion() {
+  const cab = ['Sector', 'Estado', 'Probabilidad (%)', 'Margen (± %)', 'Habitantes', 'Población vulnerable (%)', 'Mensajes recibidos', 'Responde el pase de lista'];
+  const filas = [...SECTORS].sort((a, b) => b.prob - a.prob).map(x => [x.nombre, ESTADO[x.estado].txt, x.prob, x.margen, x.hab, x.vuln, x.reportes, sinPase(x) ? 'No' : 'Sí']);
+  descargarCSV('situacion-alertia-ocana.csv', cab, filas);
 }
 
 document.addEventListener('click', ev => {
   const el = ev.target.closest('[data-action]');
   if (!el) return;
   const a = el.dataset.action;
-  if (a === 'theme') { setTheme(themeNow() === 'dark' ? 'light' : 'dark'); draw(); return; }
-  if (a === 'view') { setView(el.dataset.view); return; }
-  if (a === 'open-preset') { st = PRESETS[+el.dataset.i].make(); if (st.sheet) st.sheet.fresh = true; setView('app'); return; }
-  if (!el.closest('[data-live]')) return;
-
   let reset = false;
   switch (a) {
-    case 'tab': st.tab = el.dataset.tab; st.sheet = null; reset = true; break;
+    case 'theme': setTheme(themeNow() === 'dark' ? 'light' : 'dark'); break;
+    case 'tab':
+      if (st.view === 'bandeja') st.inbox.forEach(m => { m.nuevo = false; });
+      st.view = el.dataset.tab; st.drawer = null; st.dlg = null; reset = true; break;
     case 'mode': st.mode = el.dataset.mode; break;
-    case 'sector': st.sheet = { type: 'sector', id: el.dataset.id, fresh: true }; break;
-    case 'cerrar': st.sheet = null; break;
-    case 'asignar': st.sheet = { type: 'asignar', id: el.dataset.id, intent: el.dataset.intent, team: recomendado(el.dataset.id, st.equipos), motivo: '', fresh: true }; break;
-    case 'team': if (st.sheet) st.sheet.team = el.dataset.id; break;
+    case 'sector': st.drawer = { id: el.dataset.id, fresh: true }; break;
+    case 'cerrar': st.drawer = null; break;
+    case 'cerrar-dlg': st.dlg = null; break;
+    case 'asignar': st.dlg = { id: el.dataset.id, intent: el.dataset.intent, team: recomendado(el.dataset.id, st.equipos), motivo: '', fresh: true }; break;
+    case 'team': if (st.dlg) st.dlg.team = el.dataset.id; break;
     case 'confirmar': confirmar(); return;
     case 'export': exportar(); return;
+    case 'export-situacion': exportarSituacion(); return;
+    case 'mula-sim': simularMula(); return;
     case 'pase-ahora':
       st.minutos += 1; st.pase.enviado = hhmm(st.minutos); draw();
       toast('Pase de lista enviado. Las respuestas aparecen aquí cuando lleguen.'); return;
@@ -654,29 +768,58 @@ document.addEventListener('click', ev => {
 });
 
 document.addEventListener('input', ev => {
-  if (!ev.target.matches('[data-role="motivo"]') || !st.sheet) return;
-  st.sheet.motivo = ev.target.value;
-  const ok = validar(), b = $('[data-live] [data-action="confirmar"]'), h = $('[data-live] .hint');
+  if (!ev.target.matches('[data-role="motivo"]') || !st.dlg) return;
+  st.dlg.motivo = ev.target.value;
+  const ok = validar(), b = $('.dlg [data-action="confirmar"]'), h = $('.dlg .hint');
   if (b) b.disabled = !ok;
   if (h) h.hidden = ok;
 });
 
 document.addEventListener('keydown', ev => {
-  if (ev.key === 'Escape' && st.sheet && view === 'app') { st.sheet = null; draw(); return; }
+  if (ev.key === 'Escape') {
+    if (st.dlg) { st.dlg = null; draw(); } else if (st.drawer) { st.drawer = null; draw(); }
+    return;
+  }
   if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('[role="button"][data-action]')) {
     ev.preventDefault(); ev.target.click();
   }
 });
 
-window.addEventListener('resize', fit);
-(narrowMQ.addEventListener ? narrowMQ.addEventListener.bind(narrowMQ, 'change') : narrowMQ.addListener.bind(narrowMQ))(() => renderStage());
+/* ---------- lista y mapa se resaltan entre sí ---------- */
+function resaltar(id, on) {
+  document.querySelectorAll(`.sector-g[data-id="${id}"], .row[data-action="sector"][data-id="${id}"]`).forEach(e => e.classList.toggle('hl', on));
+}
+document.addEventListener('pointerover', ev => {
+  const el = ev.target.closest('.sector-g, .row[data-action="sector"]');
+  if (el) resaltar(el.dataset.id, true);
+});
+document.addEventListener('pointerout', ev => {
+  const el = ev.target.closest('.sector-g, .row[data-action="sector"]');
+  if (el) resaltar(el.dataset.id, false);
+  if (el && el.matches('.sector-g')) { const t = $('#maptip'); if (t) t.hidden = true; }
+});
+document.addEventListener('pointermove', ev => {
+  const g = ev.target.closest('.sector-g'), tip = $('#maptip');
+  if (!tip) return;
+  if (!g) { tip.hidden = true; return; }
+  const x = byId[g.dataset.id], box = tip.parentElement.getBoundingClientRect();
+  tip.innerHTML = st.mode === 'comun'
+    ? `<b>${x.nombre}</b><span>${x.reportes} ${x.reportes === 1 ? 'mensaje' : 'mensajes'} · ${miles(x.hab)} hab.</span>`
+    : `<b>${x.nombre}</b><span class="tagc ${ESTADO[x.estado].k} ${x.estado === 'explorar' ? 'dash' : ''}">${ESTADO[x.estado].txt}</span><span>${pct(x)}</span><span>${miles(x.hab)} hab. · ${x.vuln} % vulnerables</span>`;
+  tip.hidden = false;
+  let l = ev.clientX - box.left + 16;
+  if (l + tip.offsetWidth > box.width - 6) l = ev.clientX - box.left - tip.offsetWidth - 16;
+  tip.style.left = Math.max(6, l) + 'px';
+  tip.style.top = Math.max(6, Math.min(ev.clientY - box.top + 16, box.height - tip.offsetHeight - 6)) + 'px';
+});
 
 /* ---------- inicio ---------- */
-try { const t = localStorage.getItem('prioriza-tema'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) { /* sin almacenamiento */ }
+try { const t = localStorage.getItem('alertia-tema'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) { /* sin almacenamiento */ }
 const q = new URLSearchParams(location.search);
 if (q.get('tema') === 'dark' || q.get('tema') === 'light') document.documentElement.dataset.theme = q.get('tema');
-const pantalla = parseInt(q.get('pantalla'), 10);
-if (pantalla >= 1 && pantalla <= PRESETS.length) { st = PRESETS[pantalla - 1].make(); view = 'app'; }
-else if (q.get('vista') === 'app') view = 'app';
-renderStage();
+if (['tablero', 'pase', 'bandeja', 'bitacora'].includes(q.get('vista'))) st.view = q.get('vista');
+if (q.get('modo') === 'comun') st.mode = 'comun';
+if (byId[q.get('sector')]) st.drawer = { id: q.get('sector'), fresh: false };
+if (q.get('mula') === '1') aplicarMula();
+draw(true);
 })();

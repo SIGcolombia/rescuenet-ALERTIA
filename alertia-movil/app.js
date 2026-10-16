@@ -436,7 +436,7 @@ function syncControls() {
 /* ---------- acciones ---------- */
 function setTheme(t) {
   document.documentElement.dataset.theme = t;
-  try { localStorage.setItem('rescuenet-tema', t); } catch (e) { /* sin almacenamiento */ }
+  try { localStorage.setItem('alertia-tema', t); } catch (e) { /* sin almacenamiento */ }
 }
 
 function toast(msg) {
@@ -522,7 +522,7 @@ window.addEventListener('resize', fit);
 (narrowMQ.addEventListener ? narrowMQ.addEventListener.bind(narrowMQ, 'change') : narrowMQ.addListener.bind(narrowMQ))(() => renderStage());
 
 /* ---------- inicio ---------- */
-try { const t = localStorage.getItem('rescuenet-tema'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) { /* sin almacenamiento */ }
+try { const t = localStorage.getItem('alertia-tema'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) { /* sin almacenamiento */ }
 const q = new URLSearchParams(location.search);
 if (q.get('tema') === 'dark' || q.get('tema') === 'light') document.documentElement.dataset.theme = q.get('tema');
 const pantalla = parseInt(q.get('pantalla'), 10);

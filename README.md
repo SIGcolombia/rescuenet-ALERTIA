@@ -6,9 +6,9 @@ Prototipos navegables para el reto 9 del Rally Latinoamericano de Innovación (o
 
 | Carpeta | Qué es | Quién la usa |
 |---|---|---|
-| `rescuenet-movil/` | App móvil de 8 pantallas: enviar un mensaje, pase de lista, tareas, mula de datos, verificación y privacidad | Vecino, vigía, brigadista |
-| `prioriza-web/` | Tablero de escritorio con mapa, ranking, pase de lista, bandeja de mensajes de ALERTIA y bitácora | Puesto de Mando (PMU) |
-| `prioriza-movil/` | Versión del tablero para el celular | Coordinador en terreno |
+| `alertia-movil/` | App de campo de 8 pantallas: enviar un mensaje, pase de lista, tareas, mula de datos, verificación y privacidad | Vecino, vigía, brigadista |
+| `alertia-web/` | Tablero de escritorio con mapa, ranking, pase de lista, bandeja de mensajes de ALERTIA y bitácora | Puesto de Mando (PMU) |
+| `alertia-pmu-movil/` | Versión del Puesto de Mando para el celular | Coordinador en terreno |
 
 Cada carpeta es HTML, CSS y JavaScript puros. No hay build ni dependencias: abre `index.html` o publica la raíz con GitHub Pages.
 
@@ -20,4 +20,4 @@ Cada carpeta es HTML, CSS y JavaScript puros. No hay build ni dependencias: abre
 
 ## Parámetros para la URL
 
-`?pantalla=N` (1 a 8 en ALERTIA, 1 a 6 en Prioriza móvil), `?vista=app`, `?tema=dark`. En Prioriza web: `?vista=pase|bandeja|bitacora`, `?sector=ladera`, `?modo=comun`, `?mula=1`.
+`?pantalla=N` (1 a 8 en ALERTIA, 1 a 6 en el PMU móvil), `?vista=app`, `?tema=dark`. En la web: `?vista=pase|bandeja|bitacora`, `?sector=ladera`, `?modo=comun`, `?mula=1`.

@@ -1,5 +1,5 @@
 /* ==========================================================
-   Prioriza · web
+   ALERTIA · web
    Mismos colores fijos que la versión móvil: Actuar #C0392B,
    Explorar #7D3C98, Sin novedad #1E8449, amarillo #E0A800, naranja #D35400.
    ========================================================== */
@@ -528,3 +528,61 @@ body { background: var(--bg); font-size: 16px; }
 @media (prefers-reduced-motion: reduce) {
   .drawer.anim, .dlg.anim, .toast, .scrim { animation: none !important; }
 }
+
+/* ==========================================================
+   Mejoras de la versión web
+   ========================================================== */
+.pmu { padding-left: 18px; border-left: 1px solid var(--line); line-height: 1.2; }
+.pmu b { display: block; font-size: 14px; font-weight: 800; }
+.pmu small { font-size: 12.5px; color: var(--ink-2); }
+.brand small { max-width: 24ch; white-space: normal; line-height: 1.2; }
+.pagetools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pagetools .btn { min-height: 44px; font-size: 14px; }
+
+/* resumen */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); text-align: left; min-width: 0; }
+.kpi.dash { border: 2px dashed var(--c); background: color-mix(in srgb, var(--c) 7%, var(--surface)); }
+.kpi.k-actuar { border-color: color-mix(in srgb, var(--c) 55%, var(--line)); background: color-mix(in srgb, var(--c) 7%, var(--surface)); }
+.kpi .ki { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; flex: none; background: color-mix(in srgb, var(--c) 16%, var(--surface)); color: var(--ct); }
+.kpi .ki .ic { width: 24px; height: 24px; }
+.kpi b { display: block; font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.kpi div > span { display: block; margin-top: 5px; font-size: 13px; line-height: 1.25; color: var(--ink-2); font-weight: 600; }
+.kpi em { display: block; margin-top: 2px; font-style: normal; font-weight: 800; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+button.kpi { cursor: pointer; }
+button.kpi:hover { border-color: var(--ink); }
+
+/* mapa */
+.mapwrap { position: relative; }
+.maptip { position: absolute; z-index: 5; pointer-events: none; display: grid; gap: 4px; max-width: 260px; padding: 10px 12px; border-radius: 12px; background: var(--surface); color: var(--ink); border: 1px solid var(--ink); box-shadow: 0 8px 24px rgba(0, 0, 0, .25); font-size: 13px; line-height: 1.25; }
+.maptip b { font-size: 15px; }
+.maptip span { color: var(--ink-2); font-weight: 600; }
+.maptip .tagc { justify-self: start; color: var(--ct); font-size: 12px; padding: 3px 8px; }
+.sector-g { transition: transform .12s; transform-box: fill-box; transform-origin: center; }
+.sector-g.hl { transform: scale(1.07); }
+.sector-g.hl .ccl { stroke-width: 5.5; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .3)); }
+.row.hl { box-shadow: inset 0 0 0 2px var(--ink); background: var(--surface-2); }
+.team-route { fill: none; stroke: var(--ink); stroke-width: 2.6; stroke-dasharray: 1 6; stroke-linecap: round; }
+.team-mk rect { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
+.team-mk .tm-ic { color: var(--surface); stroke-width: 2.4; fill: none; }
+.team-mk text { font-size: 10.5px; font-weight: 800; fill: var(--ink); text-anchor: middle; paint-order: stroke; stroke: var(--map-bg); stroke-width: 3.4px; stroke-linejoin: round; }
+.eqstrip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; padding: 12px 18px 14px; border-top: 1px solid var(--line); }
+.eq { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 13px; }
+.eq > .ic { width: 28px; height: 28px; padding: 5px; border-radius: 9px; background: var(--surface-2); border: 1px solid var(--line); flex: none; }
+.eq b { display: block; font-weight: 800; line-height: 1.15; }
+.eq small { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-weight: 600; font-size: 12.5px; }
+.eq small::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-2); }
+.eq.libre small::before { background: var(--ok); }
+.eq.ruta small::before { background: var(--amar); }
+
+@media (max-width: 1280px) { .pmu { display: none; } }
+@media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .kpis { gap: 8px; }
+  .kpi { padding: 12px; gap: 10px; }
+  .kpi .ki { display: none; }
+  .kpi b { font-size: 26px; }
+  .eqstrip { grid-template-columns: minmax(0, 1fr); }
+  .brand small { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .sector-g { transition: none; } }
