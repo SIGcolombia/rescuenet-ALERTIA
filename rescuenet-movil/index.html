@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1D2330">
+<title>RescuENet móvil</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="showcase" id="showcase">
+  <h1>RESCUENET <span>· MÓVIL</span></h1>
+  <div class="showcase-tools">
+    <div class="pill-seg" role="group" aria-label="Vista de la demostración">
+      <button type="button" data-action="view" data-view="gallery" aria-pressed="true">Galería</button>
+      <button type="button" data-action="view" data-view="app" aria-pressed="false">App</button>
+    </div>
+    <button type="button" class="tool-btn" data-action="theme" data-theme-btn aria-label="Cambiar entre tema claro y oscuro"></button>
+  </div>
+</header>
+
+<div class="demobar" id="demobar" hidden>
+  <div class="grp">Quién usa la app
+    <div class="pill-seg" role="group" aria-label="Quién usa la app">
+      <button type="button" data-action="role" data-role="vecino" aria-pressed="true">Vecino</button>
+      <button type="button" data-action="role" data-role="vigia" aria-pressed="false">Vigía</button>
+      <button type="button" data-action="role" data-role="brigadista" aria-pressed="false">Brigadista</button>
+    </div>
+  </div>
+  <div class="grp">Conexión
+    <div class="pill-seg" role="group" aria-label="Estado de la conexión">
+      <button type="button" data-action="conn" data-conn="con" aria-pressed="false">Con señal</button>
+      <button type="button" data-action="conn" data-conn="sin" aria-pressed="true">Sin señal</button>
+      <button type="button" data-action="conn" data-conn="radio" aria-pressed="false">Radio comunitario</button>
+    </div>
+  </div>
+</div>
+
+<main id="stage" class="stage"></main>
+
+<footer class="showcase-foot" id="showcase-foot">
+  Datos de demostración. Funciona sin internet y sin librerías externas. Sin registro: la app no pide nombre ni contraseña.
+</footer>
+
+<noscript><p style="padding:24px">Esta demostración necesita JavaScript activado.</p></noscript>
+<script src="app.js"></script>
+</body>
+</html>

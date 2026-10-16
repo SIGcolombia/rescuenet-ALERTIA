@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RescuENet y Prioriza</title>
+<style>
+:root{--bg:#EEF1F5;--surface:#fff;--ink:#14202B;--ink2:#4F5D6B;--line:#D6DCE4}
+@media (prefers-color-scheme:dark){:root{--bg:#0D131A;--surface:#16202A;--ink:#EAF0F5;--ink2:#A3B0BC;--line:#2C3A48}}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+main{max-width:860px;margin:0 auto;padding:40px 16px}
+h1{font-size:clamp(28px,5vw,40px);margin:0 0 6px;letter-spacing:-.02em}p.lead{color:var(--ink2);margin:0 0 28px;max-width:60ch}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+a.card{display:block;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:inherit;text-decoration:none}
+a.card:hover,a.card:focus-visible{border-color:var(--ink)}a.card b{display:block;font-size:19px;margin-bottom:4px}a.card span{color:var(--ink2);font-size:15px}
+footer{margin-top:28px;color:var(--ink2);font-size:14px}
+</style>
+</head>
+<body><main>
+<h1>RescuENet y Prioriza</h1>
+<p class="lead">Propuesta para el reto 9 del Rally Latinoamericano de Innovación: la app que usan los barrios sin señal y el tablero con el que el Puesto de Mando de Ocaña decide a dónde ir primero.</p>
+<div class="grid">
+<a class="card" href="rescuenet-movil/"><b>RescuENet móvil</b><span>Ocho pantallas para vecinos, vigías y brigadistas.</span></a>
+<a class="card" href="prioriza-web/"><b>Prioriza web</b><span>Tablero de escritorio del Puesto de Mando.</span></a>
+<a class="card" href="prioriza-movil/"><b>Prioriza móvil</b><span>El mismo tablero para el celular del coordinador.</span></a>
+</div>
+<footer>Datos de demostración. Sin librerías externas, funciona sin internet.</footer>
+</main></body></html>
