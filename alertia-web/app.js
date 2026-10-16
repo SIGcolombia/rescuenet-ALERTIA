@@ -658,27 +658,6 @@ function dialogo(s) {
 
 
 /* ---------- portada ---------- */
-function heroFondo() {
-  let r = 7; const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
-  let bloques = '';
-  for (let cx = 0; cx < 1600; cx += 80) for (let cy = 0; cy < 900; cy += 70) {
-    if (rnd() < .22) continue;
-    const w = 46 + rnd() * 22, h = 38 + rnd() * 18;
-    bloques += `<rect class="hb-block" x="${(cx + 8 + rnd() * 6).toFixed(0)}" y="${(cy + 8 + rnd() * 6).toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}" rx="3"/>`;
-  }
-  return `<svg class="hero-bg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <rect class="hb-base" width="1600" height="900"/>
-    <g>${bloques}</g>
-    <path class="hb-river" d="M-40 640C260 600 420 760 700 700S1120 470 1380 520 1560 640 1660 600" />
-    <g class="hb-roads"><path d="M0 250H1600M0 480H1600M0 780H1600M330 0V900M760 0V900M1180 0V900M1480 0V900"/></g>
-    <polygon class="hb-s hb-s-act" points="610,900 700,520 980,330 1130,420 1090,900"/>
-    <polygon class="hb-s hb-s-nar" points="250,620 440,380 700,520 610,900 330,900"/>
-    <polygon class="hb-s hb-s-amar" points="980,330 1050,60 1290,120 1330,400 1130,420"/>
-    <polygon class="hb-s hb-s-ok" points="1130,420 1330,400 1600,470 1600,900 1090,900"/>
-    <circle class="hb-pt" cx="880" cy="560" r="7"/><circle class="hb-pt" cx="1180" cy="250" r="7"/><circle class="hb-pt" cx="470" cy="520" r="7"/>
-  </svg>`;
-}
-
 function landing() {
   const tira = [['tablero', ICON.map, 'Tablero de sectores'], ['pase', ICON.clip, 'Pase de lista'], ['bandeja', ICON.inbox, 'Bandeja ALERTIA'], ['bitacora', ICON.book, 'Bitácora']]
     .map(([t, ic, tx]) => `<button type="button" data-action="entrar" data-tab="${t}">${ic}<span>${tx}</span></button>`).join('')
@@ -696,7 +675,7 @@ function landing() {
   ].map(([n, t, d]) => `<li><b class="l-n">${n}</b><div><h3>${t}</h3><p>${d}</p></div></li>`).join('');
   return `<div class="landing">
     <section class="hero">
-      ${heroFondo()}<div class="hero-shade"></div>
+      <div class="hero-shade"></div>
       <header class="l-top">
         <span class="l-brand">${logoSvg('word')}</span>
         <div class="l-right">
