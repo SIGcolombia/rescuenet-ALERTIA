@@ -410,3 +410,7 @@ h1, h2, h3, p, output { margin: 0; }
   .notch, .statusbar { display: none; }
   .topbar { padding-top: calc(8px + env(safe-area-inset-top, 0px)); }
 }
+
+/* logo ALERTIA */
+.logo-svg { display: block; width: auto; color: var(--ink); }
+.brand .logo-svg { height: 22px; margin-bottom: 3px; }

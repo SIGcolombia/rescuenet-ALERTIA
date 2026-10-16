@@ -383,13 +383,27 @@ const MULA_VALTA = [
 
 const sinPase = x => x.vigias.every(v => v.resp === 0);
 
+/* ---------- logo ALERTIA (vectorizado del PDF oficial) ---------- */
+const LG = {
+  g: ["M 541.9 540.7 C 546 540.8 549.9 540.9 553.8 540.1 C 555.7 539.7 557.5 539.1 559.2 538.2 C 563.6 535.8 565.5 531.8 565.5 526.8 C 565.6 521.8 563.7 517.7 559.1 515.2 C 553.7 512.2 547.9 512.6 541.9 512.8 Z M 606.9 603.7 L 603.8 603.7 C 593.4 603.7 583 603.7 572.7 603.8 C 570.8 603.8 569.7 603.2 568.7 601.6 C 560.4 588.7 552.1 575.7 543.7 562.8 C 543.3 562.1 542.8 561.5 541.9 560.9 L 541.9 603.2 C 539.8 603.8 515.2 603.9 512.4 603.4 L 512.4 490.2 C 513 490.1 513.5 489.9 514.1 489.9 C 530 489.9 545.9 489.8 561.8 490.1 C 570.6 490.2 578.7 493 585.3 499.1 C 591.9 505.2 595 512.9 595.7 521.6 C 596.1 527.1 595.8 532.5 594 537.8 C 591 546.6 584.9 552.3 576.3 555.5 C 574.7 556.1 573.2 556.5 571.2 557.1 C 583.1 572.6 594.8 587.9 606.9 603.7", "M 490.9 490.1 L 490.9 514.9 C 479.3 515.1 467.8 514.9 456.1 515 L 456.1 533.9 C 461.6 534 467.1 533.9 472.6 533.9 C 478 533.9 483.4 533.9 489 533.9 L 489 559.1 L 456.1 559.1 L 456.1 578.5 C 460 578.7 463.8 578.6 467.7 578.6 C 471.5 578.6 475.3 578.6 479.1 578.6 C 483 578.6 486.8 578.6 490.9 578.6 L 490.9 603.6 L 426.8 603.6 C 426.3 601.7 426.1 494.1 426.6 490.1 Z M 490.9 490.1", "M 609 490 L 686.8 490 L 686.8 514.9 L 662.8 514.9 C 662.6 518 662.7 520.9 662.7 523.8 C 662.7 526.7 662.7 529.7 662.7 532.6 L 662.7 568.2 C 662.7 571.1 662.7 574 662.7 577 L 662.7 594.6 C 662.7 597.6 662.7 600.5 662.7 603.6 L 633.2 603.6 L 633.2 515.1 C 625 514.8 609.2 514.9 609.2 514.9 Z M 609 490", "M 411 603.6 L 346.5 603.6 C 346 601.8 346.3 490.3 346.3 490.3 L 375.7 490.3 L 375.7 578.6 L 411 578.6 Z M 411 603.6", "M 729.6 603.6 L 700.4 603.6 L 700.4 490.1 L 729.6 490.1 Z M 729.6 603.6", "M 295.9 537.8 C 292.1 540.8 290.3 544.9 289.1 549.5 C 288.8 550.9 288.5 553.5 288.1 554.8 C 287.9 552.5 287.8 548.9 287.4 546.5 C 287.2 545.2 287.1 543.9 286.6 542.7 C 285.6 540.3 283.4 539.3 280.8 539.1 C 277 538.9 267.6 541 266.6 541.1 C 267.8 540.6 277.6 535.8 281.1 533.7 C 285.3 531.2 288.2 527.5 289.7 522.8 C 290.7 520.1 292.4 513.2 292.4 513.2 C 292.4 513.2 292.7 516.4 292.8 517.5 C 293 518.7 293.2 519.9 293.5 521.1 C 294.8 524.6 297.4 526.1 301 525.3 C 304.7 524.5 308.3 523.6 312 522.6 L 303.4 490.3 L 274.5 490.3 L 244.4 603.7 L 270.7 603.7 L 275.2 584.7 L 302.4 584.7 L 306.7 603.7 L 333.5 603.7 L 313.4 528.2 C 309.1 530.1 304.9 532.3 300.6 534.5 C 298.9 535.4 297.4 536.6 295.9 537.8", "M 799.4 564.6 C 795.6 547.6 792.7 531.5 790.7 516.2 L 790.4 516.2 C 788.4 532 785.5 548.1 781.8 564.6 Z M 835.6 604 L 808.7 604 L 804.4 585 L 777.1 585 L 772.6 604 L 746.3 604 L 776.4 490.3 L 805.4 490.3 Z M 835.6 604"],
+  cap: 'M286.4 476C282.8 476 279.8 478.9 279.8 482.6V487.7H298.1V482.6C298.1 478.9 295.2 476 291.5 476Z',
+  n: 0
+};
+/* tipo 'word' = nombre completo, 'icon' = solo la A. Usa currentColor: negro en claro, blanco en oscuro. */
+function logoSvg(tipo = 'word', cls = '') {
+  const id = 'lg' + (++LG.n), icon = tipo === 'icon';
+  const vb = icon ? '240 472 98 136' : '244 476 592 128';
+  const gl = (icon ? [LG.g[5]] : LG.g).map(d => `<path d="${d}"/>`).join('');
+  return `<svg class="logo-svg ${cls}" viewBox="${vb}" role="img" aria-label="ALERTIA"><defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="279.8" x2="298.1" y1="0" y2="0"><stop offset="0" stop-color="#F7931E"/><stop offset="1" stop-color="#ED1C24"/></linearGradient></defs><g fill="currentColor">${gl}</g><path d="${LG.cap}" fill="url(#${id})"/></svg>`;
+}
+
 /* ---------- estado ---------- */
 const equiposIni = () => ({
   bomberos1: { estado: 'disponible' }, dc3: { estado: 'disponible' },
   dron1: { estado: 'disponible' }, cruzroja2: { estado: 'enruta', destino: 'Centro' }
 });
 const baseState = () => ({
-  view: 'tablero', mode: 'alertia', drawer: null, dlg: null, pase: { enviado: null },
+  landing: true, view: 'tablero', mode: 'alertia', drawer: null, dlg: null, pase: { enviado: null },
   equipos: equiposIni(), bitacora: SEED.map(x => ({ ...x })), minutos: 14 * 60 + 34, toast: null,
   inbox: INBOX0.map(m => ({ ...m, e: m.e ?? m.l, nuevo: false })), mulaOk: false
 });
@@ -402,7 +416,7 @@ const themeIcon = () => (themeNow() === 'dark' ? ICON.sun : ICON.moon);
 function header(s) {
   const h = horaEvento(s.minutos);
   return `<header class="hdr">
-    <div class="brand"><span class="logo">${ICON.logo}</span><div><b>ALERTIA</b><small>Alertas inteligentes para proteger vidas</small></div></div>
+    <button type="button" class="brand" data-action="home" aria-label="ALERTIA, volver a la portada">${logoSvg('word')}<small>Alertas inteligentes para proteger vidas</small></button>
     <div class="pmu"><b>Puesto de Mando Unificado</b><small>Ocaña, Norte de Santander</small></div>
     <div class="hdr-chan">${canales()}</div>
     <div class="hora" aria-label="Hora ${h} desde el inicio del evento"><b>Hora ${h}</b><small>desde el inicio</small></div>
@@ -642,8 +656,82 @@ function dialogo(s) {
   </section>`;
 }
 
+
+/* ---------- portada ---------- */
+function heroFondo() {
+  let r = 7; const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+  let bloques = '';
+  for (let cx = 0; cx < 1600; cx += 80) for (let cy = 0; cy < 900; cy += 70) {
+    if (rnd() < .22) continue;
+    const w = 46 + rnd() * 22, h = 38 + rnd() * 18;
+    bloques += `<rect class="hb-block" x="${(cx + 8 + rnd() * 6).toFixed(0)}" y="${(cy + 8 + rnd() * 6).toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}" rx="3"/>`;
+  }
+  return `<svg class="hero-bg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect class="hb-base" width="1600" height="900"/>
+    <g>${bloques}</g>
+    <path class="hb-river" d="M-40 640C260 600 420 760 700 700S1120 470 1380 520 1560 640 1660 600" />
+    <g class="hb-roads"><path d="M0 250H1600M0 480H1600M0 780H1600M330 0V900M760 0V900M1180 0V900M1480 0V900"/></g>
+    <polygon class="hb-s hb-s-act" points="610,900 700,520 980,330 1130,420 1090,900"/>
+    <polygon class="hb-s hb-s-nar" points="250,620 440,380 700,520 610,900 330,900"/>
+    <polygon class="hb-s hb-s-amar" points="980,330 1050,60 1290,120 1330,400 1130,420"/>
+    <polygon class="hb-s hb-s-ok" points="1130,420 1330,400 1600,470 1600,900 1090,900"/>
+    <circle class="hb-pt" cx="880" cy="560" r="7"/><circle class="hb-pt" cx="1180" cy="250" r="7"/><circle class="hb-pt" cx="470" cy="520" r="7"/>
+  </svg>`;
+}
+
+function landing() {
+  const tira = [['tablero', ICON.map, 'Tablero de sectores'], ['pase', ICON.clip, 'Pase de lista'], ['bandeja', ICON.inbox, 'Bandeja ALERTIA'], ['bitacora', ICON.book, 'Bitácora']]
+    .map(([t, ic, tx]) => `<button type="button" data-action="entrar" data-tab="${t}">${ic}<span>${tx}</span></button>`).join('')
+    + `<button type="button" data-action="ver-info">${ICON.info}<span>Cómo funciona</span></button>`;
+  const para = [
+    [ICON.users, 'Priorizar', 'Ordena los sectores según las personas vulnerables que probablemente necesitan ayuda, con un porcentaje y su margen de error.'],
+    [ICON.eye, 'Mirar el silencio', 'Un sector que no contesta también es un dato. ALERTIA lo marca como «Explorar» y no lo da por seguro.'],
+    [ICON.radio, 'Llegar sin internet', 'Los mensajes viajan por SMS, radio LoRa o mula de datos, y la app de campo funciona sin señal.'],
+    [ICON.book, 'Dejar constancia', 'Cada decisión queda en la bitácora con lo que recomendaba el sistema y quién decidió.']
+  ].map(([ic, t, d]) => `<article class="l-card"><span class="l-ic">${ic}</span><h3>${t}</h3><p>${d}</p></article>`).join('');
+  const pasos = [
+    ['1', 'Reportan', 'Vecinos, vigías y brigadistas envían un solo número que resume lo que ven. No piden nombre ni contraseña.'],
+    ['2', 'ALERTIA ordena', 'Junta los mensajes, estima dónde hay más gente en riesgo y separa los sectores sin información.'],
+    ['3', 'El coordinador decide', 'Asigna el equipo desde el tablero. ALERTIA recomienda, la decisión es de la persona.']
+  ].map(([n, t, d]) => `<li><b class="l-n">${n}</b><div><h3>${t}</h3><p>${d}</p></div></li>`).join('');
+  return `<div class="landing">
+    <section class="hero">
+      ${heroFondo()}<div class="hero-shade"></div>
+      <header class="l-top">
+        <span class="l-brand">${logoSvg('word')}</span>
+        <div class="l-right">
+          <button type="button" class="l-link" data-action="entrar" data-tab="tablero">Puesto de Mando</button>
+          <button type="button" class="icon-btn" data-action="theme" data-theme-btn aria-label="Cambiar entre tema claro y oscuro">${themeIcon()}</button>
+        </div>
+      </header>
+      <div class="hero-body">
+        <p class="l-kicker">Reto 9 · Priorización post-emergencia · Ocaña, Norte de Santander</p>
+        <h1 class="hero-word" aria-label="ALERTIA">${logoSvg('word')}</h1>
+        <p class="hero-tag">Alertas inteligentes para proteger vidas</p>
+        <p class="hero-txt">Después de una emergencia no alcanza para todos a la vez. ALERTIA reúne los mensajes de la comunidad, aunque no haya internet, y le dice al Puesto de Mando dónde actuar primero y dónde todavía nadie ha avisado.</p>
+        <button type="button" class="btn-hero" data-action="entrar" data-tab="tablero">Entrar al Puesto de Mando</button>
+      </div>
+      <nav class="l-strip" aria-label="Accesos rápidos">${tira}</nav>
+    </section>
+    <section class="l-info" id="info">
+      <div class="l-wrap">
+        <p class="l-eyebrow">Qué es</p>
+        <h2>Un tablero que sirve para decidir con poca información</h2>
+        <p class="l-lead">ALERTIA conecta una app de campo para la comunidad con un tablero para el Puesto de Mando Unificado. Su trabajo es convertir mensajes sueltos en una lista clara de sectores donde actuar y sectores donde hay que averiguar.</p>
+        <h2 class="l-h2b">Para qué sirve</h2>
+        <div class="l-cards">${para}</div>
+        <h2 class="l-h2b">Cómo funciona</h2>
+        <ol class="l-steps">${pasos}</ol>
+        <div class="l-cta"><div><b>Ver el caso de Ocaña</b><span>Sectores, equipos y mensajes de ejemplo para recorrer el tablero completo.</span></div><button type="button" class="btn-hero sm" data-action="entrar" data-tab="tablero">Entrar al Puesto de Mando</button></div>
+        <p class="l-demo">Los datos son de demostración y no corresponden a información real de Ocaña.</p>
+      </div>
+    </section>
+  </div>`;
+}
+
 /* ---------- montaje ---------- */
 function appHtml(s) {
+  if (s.landing) return landing();
   const vista = s.view === 'pase' ? paseView(s) : s.view === 'bandeja' ? bandeja(s) : s.view === 'bitacora' ? bitacora(s) : tablero(s);
   return `<div class="web">${header(s)}<div class="shell">${nav(s)}
     <main class="main" id="main" tabindex="-1">${vista}<p class="foot-demo">Datos de demostración. ALERTIA recomienda, la decisión es del coordinador.</p></main></div>
@@ -749,6 +837,9 @@ document.addEventListener('click', ev => {
     case 'tab':
       if (st.view === 'bandeja') st.inbox.forEach(m => { m.nuevo = false; });
       st.view = el.dataset.tab; st.drawer = null; st.dlg = null; reset = true; break;
+    case 'home': st.landing = true; st.drawer = null; st.dlg = null; reset = true; break;
+    case 'entrar': st.landing = false; st.view = el.dataset.tab || 'tablero'; reset = true; break;
+    case 'ver-info': { const i = $('#info'); if (i) i.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); return; }
     case 'mode': st.mode = el.dataset.mode; break;
     case 'sector': st.drawer = { id: el.dataset.id, fresh: true }; break;
     case 'cerrar': st.drawer = null; break;
@@ -817,9 +908,10 @@ document.addEventListener('pointermove', ev => {
 try { const t = localStorage.getItem('alertia-tema'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) { /* sin almacenamiento */ }
 const q = new URLSearchParams(location.search);
 if (q.get('tema') === 'dark' || q.get('tema') === 'light') document.documentElement.dataset.theme = q.get('tema');
-if (['tablero', 'pase', 'bandeja', 'bitacora'].includes(q.get('vista'))) st.view = q.get('vista');
-if (q.get('modo') === 'comun') st.mode = 'comun';
-if (byId[q.get('sector')]) st.drawer = { id: q.get('sector'), fresh: false };
-if (q.get('mula') === '1') aplicarMula();
+if (['tablero', 'pase', 'bandeja', 'bitacora'].includes(q.get('vista'))) { st.view = q.get('vista'); st.landing = false; }
+if (q.get('modo') === 'comun') { st.mode = 'comun'; st.landing = false; }
+if (byId[q.get('sector')]) { st.drawer = { id: q.get('sector'), fresh: false }; st.landing = false; }
+if (q.get('mula') === '1') { aplicarMula(); st.landing = false; }
+if (q.get('inicio') === '1') st.landing = true;
 draw(true);
 })();

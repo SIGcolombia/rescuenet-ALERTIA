@@ -8,6 +8,7 @@ Prototipos navegables para el reto 9 del Rally Latinoamericano de Innovación (o
 |---|---|---|
 | `alertia-movil/` | App de campo de 8 pantallas: enviar un mensaje, pase de lista, tareas, mula de datos, verificación y privacidad | Vecino, vigía, brigadista |
 | `alertia-web/` | Tablero de escritorio con mapa, ranking, pase de lista, bandeja de mensajes de ALERTIA y bitácora | Puesto de Mando (PMU) |
+| `logo/` | Logo de ALERTIA en SVG, versiones negra y blanca, nombre completo e icono | Todas |
 | `alertia-pmu-movil/` | Versión del Puesto de Mando para el celular | Coordinador en terreno |
 
 Cada carpeta es HTML, CSS y JavaScript puros. No hay build ni dependencias: abre `index.html` o publica la raíz con GitHub Pages.
@@ -20,4 +21,4 @@ Cada carpeta es HTML, CSS y JavaScript puros. No hay build ni dependencias: abre
 
 ## Parámetros para la URL
 
-`?pantalla=N` (1 a 8 en ALERTIA, 1 a 6 en el PMU móvil), `?vista=app`, `?tema=dark`. En la web: `?vista=pase|bandeja|bitacora`, `?sector=ladera`, `?modo=comun`, `?mula=1`.
+`?pantalla=N` (1 a 8 en ALERTIA, 1 a 6 en el PMU móvil), `?vista=app`, `?tema=dark`. En la web: `?inicio=1` (portada, es lo que se ve por defecto), `?vista=tablero|pase|bandeja|bitacora` (entra directo al tablero), `?sector=ladera`, `?modo=comun`, `?mula=1`.
