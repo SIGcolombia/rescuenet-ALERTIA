@@ -674,3 +674,21 @@ html[data-theme="dark"] { --hb-base: #0B1117; --hb-block: #121B24; --hb-road: #1
   .brand .logo-svg { height: 18px; }
   .l-steps li { padding: 16px; gap: 14px; }
 }
+
+/* Portada con fotografía de fondo (fondo.jpg). Si el archivo falta, se ve el mapa de sectores. */
+.hero { background: var(--hb-base) url("fondo.jpg") center 55% / cover no-repeat; }
+.hero .hb-base { fill: transparent; }
+.hero .hb-block, .hero .hb-roads, .hero .hb-river, .hero .hb-pt { display: none; }
+.hero .hb-s { fill-opacity: calc(var(--s-op) + .1); stroke-opacity: .85; stroke-width: 3; }
+html { --hero-shade: linear-gradient(180deg, rgba(246,248,250,.80) 0%, rgba(246,248,250,.88) 55%, rgba(246,248,250,.95) 100%); --hero-sat: .5; }
+html[data-theme="dark"] { --hero-shade: linear-gradient(180deg, rgba(6,9,13,.72) 0%, rgba(6,9,13,.80) 55%, rgba(6,9,13,.90) 100%); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) { --hero-shade: linear-gradient(180deg, rgba(6,9,13,.72) 0%, rgba(6,9,13,.80) 55%, rgba(6,9,13,.90) 100%); }
+}
+.hero-shade { z-index: -2; }
+.hero-bg { z-index: -1; mix-blend-mode: normal; }
+.hero .hb-s { fill-opacity: .24; stroke-opacity: .7; stroke-width: 3; }
+html[data-theme="dark"] .hero .hb-s { fill-opacity: .30; }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) .hero .hb-s { fill-opacity: .30; } }
+.hero .hero-txt { color: var(--ink); opacity: .92; }
+.hero .l-kicker { color: var(--ink); opacity: .8; }
